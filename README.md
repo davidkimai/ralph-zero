@@ -7,11 +7,11 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Agent Skills](https://img.shields.io/badge/agent%20skills-compatible-purple.svg)](https://agentskills.io)
 
-**Ralph Zero - Your agents can now orchestrate Ralph using skills!**
+**Ralph Zero - Your agents can now orchestrate Ralph using Skills!**
 
 *Works with Claude Code, Cursor, Copilot, Amp, or any Agent Skills agent*
 
-Ralph Zero is an intelligent orchestrator system that agentically implements complex multi-step features through looped agent sessions with quality gates, context synthesis, and feedback learning.
+Ralph Zero is an intelligent orchestrator system wrapped in an [**Agent Skills**](https://agentskills.io/what-are-skills) package over [**Geoffrey Huntley's Ralph Loop**](https://ghuntley.com/ralph/) that agentically implements complex multi-step features through looped agent sessions with quality gates, context synthesis, and feedback learning.
 
 ## Overview
 
