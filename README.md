@@ -11,14 +11,14 @@
 
 *Works with Claude Code, Cursor, Copilot, Amp, or any Agent Skills agent*
 
-Ralph Zero is an intelligent orchestrator system that agentically implements complex multi-step features through looped agent sessions with quality gates, context synthesis, and iterative learning.
+Ralph Zero is an intelligent orchestrator system that agentically implements complex multi-step features through looped agent sessions with quality gates, context synthesis, and feedback learning.
 
 ## Overview
 
 Ralph Zero transforms how AI agents build software by providing:
 
 - **Intelligent Orchestration** - Python-based meta-layer manages stateless agent iterations
-- **Cognitive Feedback** - System learns patterns via mandatory AGENTS.md documentation
+- **Feedback Learning** - System learns patterns via mandatory AGENTS.md documentation
 - **Quality-Driven Execution** - Configurable gates (typecheck, tests, browser) enforce standards
 - **Universal Compatibility** - Works with Claude Code, Cursor, Copilot, Amp, any Agent Skills agent
 - **Context Synthesis** - Injects "memory" from AGENTS.md and progress.txt into each iteration
