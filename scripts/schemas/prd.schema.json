@@ -1,0 +1,100 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://github.com/ralph-zero/schemas/prd.schema.json",
+    "title": "Ralph PRD Format",
+    "description": "Product Requirements Document format for Ralph Zero",
+    "type": "object",
+    "required": [
+        "project",
+        "branchName",
+        "description",
+        "userStories"
+    ],
+    "properties": {
+        "project": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "description": "Project name"
+        },
+        "branchName": {
+            "type": "string",
+            "pattern": "^ralph/[a-z0-9-]+$",
+            "description": "Git branch name (must start with 'ralph/' and use kebab-case)"
+        },
+        "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500,
+            "description": "Feature description"
+        },
+        "userStories": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 200,
+            "items": {
+                "$ref": "#/definitions/story"
+            },
+            "description": "Array of user stories to implement"
+        }
+    },
+    "definitions": {
+        "story": {
+            "type": "object",
+            "required": [
+                "id",
+                "title",
+                "description",
+                "acceptanceCriteria",
+                "priority",
+                "passes"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "pattern": "^US-\\d{3,4}$",
+                    "description": "Story ID (e.g., US-001, US-0001)"
+                },
+                "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200,
+                    "description": "Brief story title"
+                },
+                "description": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1000,
+                    "description": "Detailed story description, preferably in user story format"
+                },
+                "acceptanceCriteria": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 20,
+                    "items": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "description": "List of acceptance criteria. Must include 'Typecheck passes'",
+                    "contains": {
+                        "const": "Typecheck passes"
+                    }
+                },
+                "priority": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Priority (lower number = higher priority, must be unique)"
+                },
+                "passes": {
+                    "type": "boolean",
+                    "description": "Whether story has been completed successfully"
+                },
+                "notes": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Optional notes about implementation"
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,170 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/ralph-zero/schemas/ralph_config.schema.json",
+  "title": "Ralph Zero Configuration",
+  "description": "Configuration file for Ralph Zero autonomous development orchestrator",
+  "type": "object",
+  "required": ["max_iterations"],
+  "properties": {
+    "agent_command": {
+      "type": "string",
+      "description": "Command to invoke agent (e.g., 'claude -p', 'amp'). Use 'auto' for auto-detection.",
+      "default": "auto",
+      "examples": ["claude -p", "amp", "cursor-agent -p", "auto"]
+    },
+    "max_iterations": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1000,
+      "default": 50,
+      "description": "Maximum iterations before stopping"
+    },
+    "context_window_strategy": {
+      "type": "string",
+      "enum": ["synthesized", "truncate", "summarize"],
+      "default": "synthesized",
+      "description": "Strategy for handling context overflow"
+    },
+    "context_config": {
+      "type": "object",
+      "description": "Configuration for context synthesis",
+      "properties": {
+        "max_progress_lines": {
+          "type": "integer",
+          "default": 100,
+          "minimum": 10,
+          "maximum": 1000,
+          "description": "Maximum lines from progress.txt to include in context"
+        },
+        "include_full_agents_md": {
+          "type": "boolean",
+          "default": true,
+          "description": "Include entire AGENTS.md or summarize"
+        },
+        "token_budget": {
+          "type": "integer",
+          "default": 8000,
+          "minimum": 1000,
+          "maximum": 100000,
+          "description": "Maximum tokens for context block"
+        }
+      }
+    },
+    "files": {
+      "type": "object",
+      "description": "File paths for state management",
+      "properties": {
+        "prd": {
+          "type": "string",
+          "default": "prd.json",
+          "description": "Path to PRD JSON file"
+        },
+        "progress": {
+          "type": "string",
+          "default": "progress.txt",
+          "description": "Path to progress log file"
+        },
+        "patterns": {
+          "type": "string",
+          "default": "AGENTS.md",
+          "description": "Path to patterns documentation"
+        },
+        "orchestrator_log": {
+          "type": "string",
+          "default": "orchestrator.log",
+          "description": "Path to detailed orchestrator log"
+        }
+      }
+    },
+    "quality_gates": {
+      "type": "object",
+      "description": "Quality gate configurations",
+      "patternProperties": {
+        "^[a-zA-Z0-9_-]+$": {
+          "type": "object",
+          "required": ["cmd", "blocking"],
+          "properties": {
+            "cmd": {
+              "type": "string",
+              "description": "Shell command to execute",
+              "minLength": 1
+            },
+            "blocking": {
+              "type": "boolean",
+              "description": "If true, failure prevents commit"
+            },
+            "timeout": {
+              "type": "integer",
+              "default": 60,
+              "minimum": 1,
+              "maximum": 3600,
+              "description": "Timeout in seconds"
+            },
+            "working_dir": {
+              "type": "string",
+              "description": "Working directory for command (optional)"
+            }
+          }
+        }
+      },
+      "examples": [
+        {
+          "typecheck": {
+            "cmd": "npm run typecheck",
+            "blocking": true,
+            "timeout": 60
+          },
+          "test": {
+            "cmd": "npm test",
+            "blocking": true,
+            "timeout": 120
+          },
+          "lint": {
+            "cmd": "npm run lint",
+            "blocking": false,
+            "timeout": 30
+          }
+        }
+      ]
+    },
+    "git": {
+      "type": "object",
+      "description": "Git configuration",
+      "properties": {
+        "commit_prefix": {
+          "type": "string",
+          "default": "[Ralph]",
+          "description": "Prefix for commit messages"
+        },
+        "auto_create_branch": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically create branch if it doesn't exist"
+        },
+        "require_clean_tree": {
+          "type": "boolean",
+          "default": false,
+          "description": "Require git tree to be clean before starting"
+        }
+      }
+    },
+    "librarian": {
+      "type": "object",
+      "description": "Librarian check configuration",
+      "properties": {
+        "check_enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable librarian checks for AGENTS.md updates"
+        },
+        "warning_after_iterations": {
+          "type": "integer",
+          "default": 3,
+          "minimum": 1,
+          "maximum": 10,
+          "description": "Warn if AGENTS.md not updated after N iterations with code changes"
+        }
+      }
+    }
+  }
+}

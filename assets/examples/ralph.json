@@ -1,0 +1,42 @@
+{
+    "agent_command": "auto",
+    "max_iterations": 50,
+    "context_window_strategy": "synthesized",
+    "context_config": {
+        "max_progress_lines": 100,
+        "include_full_agents_md": true,
+        "token_budget": 8000
+    },
+    "files": {
+        "prd": "prd.json",
+        "progress": "progress.txt",
+        "patterns": "AGENTS.md",
+        "orchestrator_log": "orchestrator.log"
+    },
+    "quality_gates": {
+        "typecheck": {
+            "cmd": "npm run typecheck",
+            "blocking": true,
+            "timeout": 60
+        },
+        "test": {
+            "cmd": "npm test",
+            "blocking": true,
+            "timeout": 120
+        },
+        "lint": {
+            "cmd": "npm run lint",
+            "blocking": false,
+            "timeout": 30
+        }
+    },
+    "git": {
+        "commit_prefix": "[Ralph]",
+        "auto_create_branch": true,
+        "require_clean_tree": false
+    },
+    "librarian": {
+        "check_enabled": true,
+        "warning_after_iterations": 3
+    }
+}
