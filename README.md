@@ -1,13 +1,17 @@
 # Ralph Zero
 
-**Next-generation autonomous development orchestrator with cognitive feedback loops**
+**Agent development orchestrator with context feedback loops**
 
 [![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/davidkimai/ralph-zero)
 [![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Agent Skills](https://img.shields.io/badge/agent%20skills-compatible-purple.svg)](https://agentskills.io)
 
-Ralph Zero is an intelligent orchestration system that autonomously implements complex multi-step features through iterative agent sessions with quality gates, context synthesis, and recursive learning.
+**Ralph Zero - Your agents can now run Ralph using skills!**
+
+*Works with Claude Code, Cursor, Copilot, Amp, or any Agent Skills agent*
+
+Ralph Zero is an intelligent orchestration system that agentically implements complex multi-step features through looped agent sessions with quality gates, context synthesis, and recursive learning.
 
 ## Overview
 
