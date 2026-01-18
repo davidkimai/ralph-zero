@@ -7,7 +7,7 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Agent Skills](https://img.shields.io/badge/agent%20skills-compatible-purple.svg)](https://agentskills.io)
 
-**Ralph Zero - Your agents can now run Ralph using skills!**
+**Ralph Zero - Your agents can now orchestrate Ralph using skills!**
 
 *Works with Claude Code, Cursor, Copilot, Amp, or any Agent Skills agent*
 
