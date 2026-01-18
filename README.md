@@ -13,6 +13,14 @@
 
 Ralph Zero is an orchestrator system wrapped in an [**Agent Skills**](https://agentskills.io/what-are-skills) package over [**Geoffrey Huntley's Ralph Loop**](https://ghuntley.com/ralph/) that implements complex multi-step features through looped agent sessions with error handling, process scheduling, memory management, and feedback learning.
 
+##
+
+<div align="center">
+    
+<img width="540" height="341" alt="image" src="https://github.com/user-attachments/assets/44b05dd6-36a1-4f3f-a890-9fe6b9c08f34" />
+
+</div>
+
 ## System Architecture
 
 ```mermaid
