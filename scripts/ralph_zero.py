@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Ralph Zero - Next-Generation Autonomous Development Orchestrator
+Ralph Zero - Agent Development Orchestrator
 
 Usage:
     ralph-zero run [--max-iterations N] [--config PATH] [--verbose]
