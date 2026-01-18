@@ -41,10 +41,10 @@ except ImportError:
     print("Error: docopt not installed. Run: pip install docopt")
     sys.exit(2)
 
-from orchestrator.config import ConfigManager
-from orchestrator.core import RalphZero
-from orchestrator.state import StateManager
-from orchestrator.utils import setup_logging, tc
+from scripts.orchestrator.config import ConfigManager
+from scripts.orchestrator.core import RalphZero
+from scripts.orchestrator.state import StateManager
+from scripts.orchestrator.utils import setup_logging, tc
 
 __version__ = "0.1.0"
 
