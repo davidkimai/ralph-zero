@@ -21,29 +21,51 @@ Ralph Zero transforms how AI agents build software by providing:
 
 ## Installation
 
-### Project-Local Installation (Recommended)
+### Universal Installation (Works with Most Agents)
 
 ```bash
-cd your-project
+git clone https://github.com/davidkimai/ralph-zero.git .agent/skills/ralph-zero
+cd .agent/skills/ralph-zero
+pip install -e .
+```
+
+### Agent-Specific Installation
+
+Choose the installation path based on your AI agent platform:
+
+```bash
+# Claude Code specific
 git clone https://github.com/davidkimai/ralph-zero.git .claude/skills/ralph-zero
-cd .claude/skills/ralph-zero
+
+# Cursor specific
+git clone https://github.com/davidkimai/ralph-zero.git .cursor/skills/ralph-zero
+
+# VS Code Copilot specific
+git clone https://github.com/davidkimai/ralph-zero.git .vscode/copilot/skills/ralph-zero
+
+# Gemini CLI specific
+git clone https://github.com/davidkimai/ralph-zero.git .gemini/skills/ralph-zero
+
+# Amp specific
+git clone https://github.com/davidkimai/ralph-zero.git .config/amp/skills/ralph-zero
+```
+
+After cloning to your preferred path:
+```bash
+cd <skills-directory>/ralph-zero
 pip install -e .
 ```
 
 ### Global Installation
 
+For system-wide availability (works across all projects):
+
 ```bash
-git clone https://github.com/davidkimai/ralph-zero.git ~/.claude/skills/ralph-zero
-cd ~/.claude/skills/ralph-zero
+# Universal path
+git clone https://github.com/davidkimai/ralph-zero.git ~/.agent/skills/ralph-zero
+cd ~/.agent/skills/ralph-zero
 pip install -e .
 ```
-
-### Agent-Specific Paths
-
-For other agents, adjust the skills directory:
-- **Cursor**: `~/.cursor/skills/ralph-zero`
-- **Amp**: `~/.config/amp/skills/ralph-zero`
-- **VS Code Copilot**: `~/.vscode/copilot/skills/ralph-zero`
 
 ## Quick Start
 
