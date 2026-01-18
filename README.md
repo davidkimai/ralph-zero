@@ -11,7 +11,7 @@
 
 *Works with Claude Code, Cursor, Copilot, Amp, or any Agent Skills agent*
 
-Ralph Zero is an orchestrator system wrapped in an [**Agent Skills**](https://agentskills.io/what-are-skills) package over [**Geoffrey Huntley's Ralph Loop**](https://ghuntley.com/ralph/) that implements complex multi-step features through looped agent sessions with error handling, memory management, and feedback learning.
+Ralph Zero is an orchestrator system wrapped in an [**Agent Skills**](https://agentskills.io/what-are-skills) package over [**Geoffrey Huntley's Ralph Loop**](https://ghuntley.com/ralph/) that implements complex multi-step features through looped agent sessions with error handling, process scheduling, memory management, and feedback learning.
 
 ## Overview
 
