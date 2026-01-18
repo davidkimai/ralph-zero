@@ -13,6 +13,93 @@
 
 Ralph Zero is an orchestrator system wrapped in an [**Agent Skills**](https://agentskills.io/what-are-skills) package over [**Geoffrey Huntley's Ralph Loop**](https://ghuntley.com/ralph/) that implements complex multi-step features through looped agent sessions with error handling, process scheduling, memory management, and feedback learning.
 
+## System Architecture
+
+```mermaid
+graph LR
+    subgraph inputs["1. You Provide"]
+        direction TB
+        prd_md["Feature Requirements<br/>prd.md"]
+        config["Project Settings<br/>ralph.json"]
+    end
+
+    subgraph control["2. Ralph Zero Manages"]
+        direction TB
+        settings["Settings Handler<br/>reads your config"]
+        tracker["Progress Tracker<br/>knows what's done"]
+        memory["Memory Builder<br/>remembers patterns"]
+        starter["Agent Starter<br/>launches fresh AI"]
+        checks["Code Validator<br/>runs your tests"]
+        teacher["Learning System<br/>saves discoveries"]
+    end
+
+    subgraph agent["3. AI Agent Works"]
+        direction TB
+        fresh["Clean Slate<br/>no prior context"]
+        work["Writes Code<br/>documents learnings"]
+    end
+
+    subgraph saved["4. Data Saved"]
+        direction TB
+        tasks["prd.json<br/>task checklist"]
+        history["progress.txt<br/>what happened"]
+        patterns["AGENTS.md<br/>learned tricks"]
+    end
+
+    subgraph results["5. You Get"]
+        direction TB
+        code["Working Code<br/>tested & committed"]
+        branch["Feature Branch<br/>ready to merge"]
+    end
+
+    prd_md -.->|converts to| tasks
+    config --> settings
+    
+    tasks --> tracker
+    tracker -->|picks next| memory
+    patterns -.->|injects| memory
+    history -.->|adds| memory
+    
+    memory -->|builds prompt| starter
+    starter -->|spawns| fresh
+    fresh --> work
+    
+    work -->|submits| checks
+    checks -->|passed| code
+    checks -->|failed| tracker
+    
+    work -.->|shares| teacher
+    teacher -.->|updates| patterns
+    tracker -.->|logs to| history
+    
+    code --> branch
+
+    classDef inputClass fill:#e3f2fd,stroke:#1976d2,stroke-width:3px,color:#000
+    classDef controlClass fill:#fff3e0,stroke:#f57c00,stroke-width:3px,color:#000
+    classDef agentClass fill:#f3e5f5,stroke:#7b1fa2,stroke-width:3px,color:#000
+    classDef savedClass fill:#e8f5e9,stroke:#388e3c,stroke-width:3px,color:#000
+    classDef resultClass fill:#fce4ec,stroke:#c2185b,stroke-width:3px,color:#000
+
+    class prd_md,config inputClass
+    class settings,tracker,memory,starter,checks,teacher controlClass
+    class fresh,work agentClass
+    class tasks,history,patterns savedClass
+    class code,branch resultClass
+```
+
+### The Ralph Zero Loop
+
+**Start**: You write a feature request, Ralph Zero breaks it into tasks
+
+**Loop**: For each task, Ralph Zero:
+1. Builds a memory package from past learnings
+2. Starts a fresh AI agent with that memory
+3. Agent writes code and documents what it learned
+4. Validates code passes all your tests
+5. Commits working code, saves learnings for next task
+
+**Result**: Complete feature with tested code and accumulated knowledge
+
 ## Overview
 
 Ralph Zero transforms how AI agents build software by providing:
