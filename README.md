@@ -1,6 +1,6 @@
 # Ralph Zero
 
-**Agent development orchestrator with context feedback loops**
+**Ralph Orchestrator Skill with context feedback loops**
 
 [![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/davidkimai/ralph-zero)
 [![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
