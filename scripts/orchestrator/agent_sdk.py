@@ -104,13 +104,13 @@ class AgentSDKInvoker:
                 allowed_tools=["Read", "Write", "Edit", "Glob", "Grep", "Bash"],
                 
                 # Set working directory
-                cwd=str(working_dir),
+                working_directory=str(working_dir),
                 
                 # Model selection
                 model=self.model,
             )
             
-            logger.debug(f"SDK options: permission_mode=acceptEdits, cwd={working_dir}")
+            logger.debug(f"SDK options: permission_mode=acceptEdits, tools={options.allowed_tools}")
             
             # Create SDK client (fresh context per invocation)
             client = ClaudeSDKClient(api_key=self.api_key)

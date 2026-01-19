@@ -499,8 +499,10 @@ class RalphZero:
         print(f"\n{tc.BOLD}Ralph Zero Status{tc.NC}")
         print(f"{'='*40}")
         print(f"Total Stories: {total}")
-        print(f"Completed: {tc.GREEN}{passed}{tc.NC} ({passed/total*100:.1f}%)")
-        print(f"Remaining: {tc.YELLOW}{total - passed}{tc.NC}")
+        # Avoid division-by-zero when no stories are present (e.g., missing prd.json)
+        percent = (passed / total * 100) if total > 0 else 0.0
+        print(f"Completed: {tc.GREEN}{passed}{tc.NC} ({percent:.1f}%)")
+        print(f"Remaining: {tc.YELLOW}{max(total - passed, 0)}{tc.NC}")
         print()
 
         if verbose:

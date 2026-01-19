@@ -12,6 +12,17 @@
       "default": "auto",
       "examples": ["claude -p", "amp", "cursor-agent -p", "auto"]
     },
+    "agent_mode": {
+      "type": "string",
+      "enum": ["cli", "api"],
+      "default": "cli",
+      "description": "Invocation mode: local CLI or direct API"
+    },
+    "model": {
+      "type": "string",
+      "default": "claude-3-7-sonnet-20250219",
+      "description": "Model identifier when using API mode"
+    },
     "max_iterations": {
       "type": "integer",
       "minimum": 1,
@@ -103,6 +114,13 @@
             "working_dir": {
               "type": "string",
               "description": "Working directory for command (optional)"
+            },
+            "env": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "description": "Additional environment variables for the gate"
             }
           }
         }
