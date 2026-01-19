@@ -67,6 +67,8 @@ class ConfigManager:
     """
 
     agent_command: str = "auto"
+    agent_mode: str = "cli"  # "cli" or "sdk"
+    model: str = "claude-3-7-sonnet-20250219"  # Model for SDK mode
     max_iterations: int = 50
     context_window_strategy: str = "synthesized"
     context_config: ContextConfig = field(default_factory=ContextConfig)
@@ -205,6 +207,8 @@ class ConfigManager:
 
         return cls(
             agent_command=config.get("agent_command", "auto"),
+            agent_mode=config.get("agent_mode", "cli"),
+            model=config.get("model", "claude-3-7-sonnet-20250219"),
             max_iterations=config.get("max_iterations", 50),
             context_window_strategy=config.get("context_window_strategy", "synthesized"),
             context_config=context_config,
@@ -246,6 +250,8 @@ class ConfigManager:
         """
         return {
             "agent_command": self.agent_command,
+            "agent_mode": self.agent_mode,
+            "model": self.model,
             "max_iterations": self.max_iterations,
             "context_window_strategy": self.context_window_strategy,
             "context_config": {

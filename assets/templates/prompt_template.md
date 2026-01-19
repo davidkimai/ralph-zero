@@ -44,7 +44,22 @@ This is what happened in recent iterations. Use this to:
 
 ---
 
-## 4. QUALITY GATES
+## 4. AGENT TOOLS (SDK Mode)
+
+**You have direct access to file system tools:**
+
+- **Read**: View any file content in the working directory
+- **Write**: Create new files  
+- **Edit**: Make precise modifications to existing files
+- **Bash**: Execute shell commands (for running quality gates, git, etc.)
+- **Glob**: Search for files by pattern (e.g., `**/*.py`)
+- **Grep**: Search file contents with regex
+
+**IMPORTANT**: In SDK mode, you can and SHOULD directly edit files using these tools. Don't just describe changes - make them! Use the Edit tool to modify code, Write tool to create new files, and Bash tool to run quality gates.
+
+---
+
+## 5. QUALITY GATES
 
 Before completing, you MUST verify these checks pass:
 
@@ -52,11 +67,11 @@ Before completing, you MUST verify these checks pass:
 
 - If ANY **blocking** check fails, debug and fix before reporting completion
 - Do NOT mark the story complete if checks fail
-- Run checks locally: the orchestrator will run them again after you finish
+- Run checks using the Bash tool (in SDK mode) or locally
 
 ---
 
-## 5. YOUR WORKFLOW
+## 6. YOUR WORKFLOW
 
 ### Step 1: Understand the Story
 - Read the description and acceptance criteria carefully

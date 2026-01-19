@@ -1,6 +1,7 @@
 """Agent invocation and output handling."""
 
 import logging
+import os
 import subprocess
 from pathlib import Path
 from typing import Optional, Tuple
@@ -15,9 +16,13 @@ class AgentInvoker:
     """
     Invokes AI agents with prompts and captures output.
 
+    Automatically detects and uses appropriate invocation method:
+    - Agent SDK: When agent_mode='sdk' or ANTHROPIC_API_KEY is available
+    - CLI: When using command-line agent invocation
+
     Provides:
     - Universal agent command interface
-    - Auto-detection of available agents
+    - Auto-detection of available agents  
     - Output capture and parsing
     - Completion signal detection
     """
@@ -31,12 +36,27 @@ class AgentInvoker:
         """
         self.config = config
         self.agent_command = config.agent_command
-
-        # Auto-detect if needed
-        if self.agent_command == "auto":
-            self.agent_command = self._auto_detect_agent()
-
-        logger.info(f"AgentInvoker initialized with command: {self.agent_command}")
+        
+        # Detect agent mode
+        self.use_sdk = self._should_use_sdk()
+        
+        if self.use_sdk:
+            logger.info("Using Agent SDK mode")
+            try:
+                from .agent_sdk import AgentSDKInvoker
+                self.sdk_invoker = AgentSDKInvoker(model=config.model)
+                logger.info(f"AgentSDKInvoker initialized (model={config.model})")
+            except Exception as e:
+                logger.error(f"Failed to initialize SDK: {e}")
+                logger.info("Falling back to CLI mode")
+                self.use_sdk = False
+                self.agent_command = self._auto_detect_agent()
+        else:
+            logger.info("Using CLI mode")
+            # Auto-detect if needed
+            if self.agent_command == "auto":
+                self.agent_command = self._auto_detect_agent()
+            logger.info(f"AgentInvoker initialized with command: {self.agent_command}")
 
     def invoke(self, prompt: str, iteration: int, timeout: int = 3600) -> str:
         """
@@ -50,6 +70,50 @@ class AgentInvoker:
         Returns:
             Agent output as string
         """
+        # Route to SDK or CLI depending on mode
+        if self.use_sdk:
+            return self._invoke_sdk(prompt, iteration, timeout)
+        else:
+            return self._invoke_cli(prompt, iteration, timeout)
+    
+    def _invoke_sdk(self, prompt: str, iteration: int, timeout: int) -> str:
+        """
+        Invoke agent via SDK.
+        
+        Args:
+            prompt: The prompt to send
+            iteration: Current iteration
+            timeout: Timeout in seconds
+            
+        Returns:
+            Agent output
+        """
+        logger.info(f"Invoking agent via SDK for iteration {iteration}")
+        print(f"\n{tc.BLUE}Invoking agent (SDK mode)...{tc.NC}")
+        
+        working_dir = Path(".")
+        result = self.sdk_invoker.invoke(
+            prompt=prompt,
+            working_dir=working_dir,
+            iteration=iteration,
+            timeout=timeout
+        )
+        
+        # Return output (SDK invoker handles completion signals internally)
+        return result.output
+    
+    def _invoke_cli(self, prompt: str, iteration: int, timeout: int) -> str:
+        """
+        Invoke agent via CLI command.
+        
+        Args:
+            prompt: The prompt to send
+            iteration: Current iteration
+            timeout: Timeout in seconds
+            
+        Returns:
+            Agent output
+        """
         logger.info(f"Invoking agent for iteration {iteration}")
         print(f"\n{tc.BLUE}Invoking agent...{tc.NC}")
 
@@ -59,13 +123,13 @@ class AgentInvoker:
             prompt_file.write_text(prompt, encoding="utf-8")
             logger.debug(f"Wrote prompt to {prompt_file} ({len(prompt)} chars)")
 
-            # Build command
+            # Build command with prompt file path replacement
             if "{prompt_file}" in self.agent_command:
-                # Command expects prompt file path
+                # Command expects prompt file path (e.g., "cat {prompt_file} | claude -p")
                 cmd = self.agent_command.replace("{prompt_file}", str(prompt_file))
             else:
-                # Command expects prompt via stdin or as arg
-                cmd = f'{self.agent_command} "{prompt_file}"'
+                # Legacy: command doesn't use placeholder, assume stdin
+                cmd = f"cat {prompt_file} | {self.agent_command}"
 
             logger.debug(f"Executing: {cmd}")
 
@@ -145,6 +209,26 @@ class AgentInvoker:
         logger.warning("Agent did not report completion or failure")
         return (False, "NO_COMPLETION_SIGNAL")
 
+    def _should_use_sdk(self) -> bool:
+        """
+        Determine if SDK mode should be used.
+        
+        Returns:
+            True if SDK should be used, False for CLI mode
+        """
+        # Check explicit config
+        if self.config.agent_mode == "sdk":
+            logger.info("SDK mode explicitly configured")
+            return True
+        
+        # Check if API key is available (auto-enable SDK)
+        if os.getenv("ANTHROPIC_API_KEY"):
+            logger.info("ANTHROPIC_API_KEY found, enabling SDK mode")
+            return True
+        
+        # Default to CLI
+        return False
+    
     def _auto_detect_agent(self) -> str:
         """
         Auto-detect available agent command.

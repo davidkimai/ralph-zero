@@ -1,9 +1,9 @@
 # Ralph Zero - Next-Generation Autonomous Development System
 
-Python 3.10+
 typing-extensions>=4.5.0
 jsonschema>=4.17.0
 docopt>=0.6.2
-
-# Optional dependencies
-tiktoken>=0.5.0  # For accurate token counting
+rich>=12.0.0
+GitPython>=3.1.0
+tiktoken>=0.5.0
+claude-agent-sdk>=0.1.0
