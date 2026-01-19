@@ -6,4 +6,4 @@ docopt>=0.6.2
 rich>=12.0.0
 GitPython>=3.1.0
 tiktoken>=0.5.0
-claude-agent-sdk>=0.1.0
+anthropic>=0.40.0

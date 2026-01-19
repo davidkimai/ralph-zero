@@ -37,26 +37,27 @@ class AgentInvoker:
         self.config = config
         self.agent_command = config.agent_command
         
-        # Detect agent mode
-        self.use_sdk = self._should_use_sdk()
+        # Detect agent mode (API takes precedence over SDK)
+        self.use_api = self._should_use_api()
+        self.use_sdk = False  # Deprecated: SDK mode removed
         
-        if self.use_sdk:
-            logger.info("Using Agent SDK mode")
+        if self.use_api:
+            logger.info("Using Direct API mode")
             try:
-                from .agent_sdk import AgentSDKInvoker
-                self.sdk_invoker = AgentSDKInvoker(model=config.model)
-                logger.info(f"AgentSDKInvoker initialized (model={config.model})")
+                from .agent_api import RalphAgentAPI
+                self.api_invoker = RalphAgentAPI(model=config.model)
+                logger.info(f"RalphAgentAPI initialized (model={config.model})")
             except Exception as e:
-                logger.error(f"Failed to initialize SDK: {e}")
+                logger.error(f"Failed to initialize API: {e}")
                 logger.info("Falling back to CLI mode")
-                self.use_sdk = False
-                self.agent_command = self._auto_detect_agent()
+                self.use_api = False
+                if self.agent_command == "auto":
+                    self.agent_command = self._auto_detect_agent()
         else:
             logger.info("Using CLI mode")
             # Auto-detect if needed
             if self.agent_command == "auto":
                 self.agent_command = self._auto_detect_agent()
-            logger.info(f"AgentInvoker initialized with command: {self.agent_command}")
 
     def invoke(self, prompt: str, iteration: int, timeout: int = 3600) -> str:
         """
@@ -70,15 +71,15 @@ class AgentInvoker:
         Returns:
             Agent output as string
         """
-        # Route to SDK or CLI depending on mode
-        if self.use_sdk:
-            return self._invoke_sdk(prompt, iteration, timeout)
+        # Route to API or CLI depending on mode
+        if self.use_api:
+            return self._invoke_api(prompt, iteration, timeout)
         else:
             return self._invoke_cli(prompt, iteration, timeout)
     
-    def _invoke_sdk(self, prompt: str, iteration: int, timeout: int) -> str:
+    def _invoke_api(self, prompt: str, iteration: int, timeout: int) -> str:
         """
-        Invoke agent via SDK.
+        Invoke agent via Direct API.
         
         Args:
             prompt: The prompt to send
@@ -88,18 +89,18 @@ class AgentInvoker:
         Returns:
             Agent output
         """
-        logger.info(f"Invoking agent via SDK for iteration {iteration}")
-        print(f"\n{tc.BLUE}Invoking agent (SDK mode)...{tc.NC}")
+        logger.info(f"Invoking agent via Direct API for iteration {iteration}")
+        print(f"\n{tc.BLUE}Invoking agent (Direct API mode)...{tc.NC}")
         
         working_dir = Path(".")
-        result = self.sdk_invoker.invoke(
+        result = self.api_invoker.invoke(
             prompt=prompt,
             working_dir=working_dir,
             iteration=iteration,
             timeout=timeout
         )
         
-        # Return output (SDK invoker handles completion signals internally)
+        # Return output
         return result.output
     
     def _invoke_cli(self, prompt: str, iteration: int, timeout: int) -> str:
@@ -209,21 +210,21 @@ class AgentInvoker:
         logger.warning("Agent did not report completion or failure")
         return (False, "NO_COMPLETION_SIGNAL")
 
-    def _should_use_sdk(self) -> bool:
+    def _should_use_api(self) -> bool:
         """
-        Determine if SDK mode should be used.
+        Determine if Direct API mode should be used.
         
         Returns:
-            True if SDK should be used, False for CLI mode
+            True if API should be used, False for CLI mode
         """
         # Check explicit config
-        if self.config.agent_mode == "sdk":
-            logger.info("SDK mode explicitly configured")
+        if self.config.agent_mode == "api":
+            logger.info("API mode explicitly configured")
             return True
         
-        # Check if API key is available (auto-enable SDK)
+        # Check if API key is available (auto-enable API)
         if os.getenv("ANTHROPIC_API_KEY"):
-            logger.info("ANTHROPIC_API_KEY found, enabling SDK mode")
+            logger.info("ANTHROPIC_API_KEY found, enabling API mode")
             return True
         
         # Default to CLI
