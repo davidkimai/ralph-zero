@@ -235,6 +235,8 @@ Create `ralph.json` in your project root:
 ```json
 {
   "agent_command": "auto",
+  "agent_mode": "cli", // or "api" (requires ANTHROPIC_API_KEY)
+  "model": "claude-3-7-sonnet-20250219",
   "max_iterations": 50,
   "quality_gates": {
     "typecheck": {
@@ -377,6 +379,16 @@ pytest -v
 ```
 
 Target: Greater than 80% code coverage
+
+### API Mode (Optional)
+
+If you prefer direct API invocation instead of a local CLI:
+
+1. Set `agent_mode` to `api` in `ralph.json`.
+2. Export `ANTHROPIC_API_KEY` in your environment.
+3. (Optional) `pip install anthropic` for best compatibility.
+
+When `agent_mode` is `cli` (default) or no API key is present, Ralph Zero auto-detects a local agent (Claude CLI, Cursor, Amp, Copilot) and streams the full prompt via STDIN to ensure completion signals are honored.
 
 ## Comparison to Original Ralph
 

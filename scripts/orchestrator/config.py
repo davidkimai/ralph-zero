@@ -55,6 +55,7 @@ class QualityGate:
     blocking: bool
     timeout: int = 60
     working_dir: Optional[str] = None
+    env: Optional[Dict[str, str]] = None
 
 
 @dataclass
@@ -67,8 +68,8 @@ class ConfigManager:
     """
 
     agent_command: str = "auto"
-    agent_mode: str = "cli"  # "cli" or "sdk"
-    model: str = "claude-3-7-sonnet-20250219"  # Model for SDK mode
+    agent_mode: str = "cli"  # "cli" or "api"
+    model: str = "claude-3-7-sonnet-20250219"
     max_iterations: int = 50
     context_window_strategy: str = "synthesized"
     context_config: ContextConfig = field(default_factory=ContextConfig)
@@ -186,6 +187,7 @@ class ConfigManager:
                 blocking=gate["blocking"],
                 timeout=gate.get("timeout", 60),
                 working_dir=gate.get("working_dir"),
+                env=gate.get("env"),
             )
             for name, gate in quality_gates_dict.items()
         }
@@ -271,6 +273,7 @@ class ConfigManager:
                     "blocking": gate.blocking,
                     "timeout": gate.timeout,
                     **({"working_dir": gate.working_dir} if gate.working_dir else {}),
+                    **({"env": gate.env} if gate.env else {}),
                 }
                 for name, gate in self.quality_gates.items()
             },

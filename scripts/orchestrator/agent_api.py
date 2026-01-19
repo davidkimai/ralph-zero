@@ -104,10 +104,15 @@ class RalphAgentAPI:
             # Call Anthropic API - NO conversation history!
             response = self.client.messages.create(
                 model=self.model,
-                max_tokens=4096,
+                max_tokens=8192,  # Ensure headroom for completion signal
                 messages=messages,  # CRITICAL: No history
                 tools=tools,
                 temperature=0.7,
+                system=(
+                    "You MUST end your response with either <promise>COMPLETE</promise> if successful, or "
+                    "<promise>FAILED: reason</promise> if you encounter blocking issues. This signal is CRITICAL "
+                    "for the orchestrator to know you've finished."
+                ),
             )
             
             # Handle tool calling loop
@@ -147,10 +152,15 @@ class RalphAgentAPI:
                 # Continue conversation
                 response = self.client.messages.create(
                     model=self.model,
-                    max_tokens=4096,
+                    max_tokens=8192,
                     messages=messages,
                     tools=tools,
                     temperature=0.7,
+                    system=(
+                        "You MUST end your response with either <promise>COMPLETE</promise> if successful, or "
+                        "<promise>FAILED: reason</promise> if you encounter blocking issues. This signal is CRITICAL "
+                        "for the orchestrator to know you've finished."
+                    ),
                 )
             
             # Extract final text output

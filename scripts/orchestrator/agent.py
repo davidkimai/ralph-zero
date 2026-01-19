@@ -1,4 +1,9 @@
-"""Agent invocation and output handling."""
+"""Agent invocation and output handling.
+
+Supports two modes for cross-agent compatibility:
+- CLI mode (default): invokes local agent CLIs (Claude, Cursor, Amp, Copilot)
+- API mode: uses direct Anthropic API when configured or API key present
+"""
 
 import logging
 import os
@@ -16,10 +21,6 @@ class AgentInvoker:
     """
     Invokes AI agents with prompts and captures output.
 
-    Automatically detects and uses appropriate invocation method:
-    - Agent SDK: When agent_mode='sdk' or ANTHROPIC_API_KEY is available
-    - CLI: When using command-line agent invocation
-
     Provides:
     - Universal agent command interface
     - Auto-detection of available agents  
@@ -36,28 +37,26 @@ class AgentInvoker:
         """
         self.config = config
         self.agent_command = config.agent_command
-        
-        # Detect agent mode (API takes precedence over SDK)
-        self.use_api = self._should_use_api()
-        self.use_sdk = False  # Deprecated: SDK mode removed
-        
-        if self.use_api:
-            logger.info("Using Direct API mode")
+
+        # Decide API vs CLI
+        self.use_api = False
+        if getattr(config, "agent_mode", "cli") == "api" or os.getenv("ANTHROPIC_API_KEY"):
+            # Try to initialize API invoker; if it fails, fall back to CLI
             try:
                 from .agent_api import RalphAgentAPI
-                self.api_invoker = RalphAgentAPI(model=config.model)
-                logger.info(f"RalphAgentAPI initialized (model={config.model})")
+                model = getattr(config, "model", "claude-3-7-sonnet-20250219")
+                self.api_invoker = RalphAgentAPI(model=model)
+                self.use_api = True
+                logger.info("AgentInvoker configured for Direct API mode")
             except Exception as e:
-                logger.error(f"Failed to initialize API: {e}")
-                logger.info("Falling back to CLI mode")
+                logger.warning(f"API initialization failed ({e}); falling back to CLI")
                 self.use_api = False
-                if self.agent_command == "auto":
-                    self.agent_command = self._auto_detect_agent()
-        else:
-            logger.info("Using CLI mode")
-            # Auto-detect if needed
-            if self.agent_command == "auto":
-                self.agent_command = self._auto_detect_agent()
+
+        # Auto-detect CLI command if needed
+        if not self.use_api and self.agent_command == "auto":
+            self.agent_command = self._auto_detect_agent()
+
+        logger.info(f"AgentInvoker initialized with command: {self.agent_command}")
 
     def invoke(self, prompt: str, iteration: int, timeout: int = 3600) -> str:
         """
@@ -71,54 +70,20 @@ class AgentInvoker:
         Returns:
             Agent output as string
         """
-        # Route to API or CLI depending on mode
+        # Route to API if enabled
         if self.use_api:
-            return self._invoke_api(prompt, iteration, timeout)
-        else:
-            return self._invoke_cli(prompt, iteration, timeout)
-    
-    def _invoke_api(self, prompt: str, iteration: int, timeout: int) -> str:
-        """
-        Invoke agent via Direct API.
-        
-        Args:
-            prompt: The prompt to send
-            iteration: Current iteration
-            timeout: Timeout in seconds
-            
-        Returns:
-            Agent output
-        """
-        logger.info(f"Invoking agent via Direct API for iteration {iteration}")
-        print(f"\n{tc.BLUE}Invoking agent (Direct API mode)...{tc.NC}")
-        
-        working_dir = Path(".")
-        result = self.api_invoker.invoke(
-            prompt=prompt,
-            working_dir=working_dir,
-            iteration=iteration,
-            timeout=timeout
-        )
-        
-        # Return output
-        return result.output
-    
-    def _invoke_cli(self, prompt: str, iteration: int, timeout: int) -> str:
-        """
-        Invoke agent via CLI command.
-        
-        Args:
-            prompt: The prompt to send
-            iteration: Current iteration
-            timeout: Timeout in seconds
-            
-        Returns:
-            Agent output
-        """
+            logger.info(f"Invoking agent via Direct API for iteration {iteration}")
+            print(f"\n{tc.BLUE}Invoking agent (API)...{tc.NC}")
+            try:
+                return self.api_invoker.invoke(prompt, Path("."), iteration).output  # type: ignore[attr-defined]
+            except Exception as e:
+                logger.error(f"API invocation failed: {e}")
+                return f"<promise>FAILED: API_ERROR {e}</promise>"
         logger.info(f"Invoking agent for iteration {iteration}")
         print(f"\n{tc.BLUE}Invoking agent...{tc.NC}")
 
-        # Write prompt to temporary file
+        # Write prompt to temporary file (useful for debugging and for agents
+        # that accept a file path placeholder in the command)
         prompt_file = Path(f".ralph_prompt_{iteration}.md")
         try:
             prompt_file.write_text(prompt, encoding="utf-8")
@@ -126,11 +91,15 @@ class AgentInvoker:
 
             # Build command with prompt file path replacement
             if "{prompt_file}" in self.agent_command:
-                # Command expects prompt file path (e.g., "cat {prompt_file} | claude -p")
+                # Command explicitly requests the prompt file path placeholder
                 cmd = self.agent_command.replace("{prompt_file}", str(prompt_file))
+                run_kwargs = {}
             else:
-                # Legacy: command doesn't use placeholder, assume stdin
-                cmd = f"cat {prompt_file} | {self.agent_command}"
+                # Prefer feeding prompt via STDIN for generic agent commands
+                # (e.g., `claude -p`) to avoid passing the literal filename as the prompt.
+                # Many CLIs accept the prompt from STDIN when no explicit prompt arg is given.
+                cmd = self.agent_command
+                run_kwargs = {"input": prompt}
 
             logger.debug(f"Executing: {cmd}")
 
@@ -141,6 +110,7 @@ class AgentInvoker:
                 capture_output=True,
                 text=True,
                 timeout=timeout,
+                **run_kwargs,
             )
 
             output = result.stdout
@@ -241,7 +211,9 @@ class AgentInvoker:
 
         # Try common agent commands in order of preference
         candidates = [
-            ("claude", "claude -p"),
+            # For Claude CLI, prefer reading the prompt from STDIN via shell redirection
+            # to ensure the full prompt content is received.
+            ("claude", "claude -p < {prompt_file}"),
             ("amp", "amp"),
             ("cursor", "cursor-agent -p"),
             ("copilot", "copilot-agent"),
